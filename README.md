@@ -138,3 +138,45 @@ Dự án có các tính năng bảo mật cao cấp:
 ## Giấy Phép
 
 Dự án này được phát hành dưới giấy phép MIT.
+
+## Collaboration Guide
+
+### Setting up the repository
+1. Create a GitHub repository (if not already done)
+2. Connect your local repository to GitHub:
+   ```bash
+   git remote add origin https://github.com/yourusername/your-repo-name.git
+   git branch -M main
+   git push -u origin main
+   ```
+
+### For collaborators
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/yourusername/your-repo-name.git
+   cd your-repo-name
+   ```
+2. Set up the development environment by following the setup instructions above.
+3. Create a new branch for your feature:
+   ```bash
+   git checkout -b feature/your-feature-name
+   ```
+4. Make your changes and commit them:
+   ```bash
+   git add .
+   git commit -m "Add your meaningful commit message"
+   ```
+5. Push your changes:
+   ```bash
+   git push origin feature/your-feature-name
+   ```
+6. Create a pull request on GitHub.
+
+### Keeping your fork updated
+If you're working from a fork, keep it updated with the main repository:
+```bash
+git remote add upstream https://github.com/original-owner/original-repo.git
+git fetch upstream
+git merge upstream/main
+git push origin main
+```
