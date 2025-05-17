@@ -1,0 +1,29 @@
+{
+  "name": "user-management-system",
+  "version": "1.0.0",
+  "description": "Hệ thống quản lý người dùng với xác thực 2FA và phân quyền",
+  "private": true,
+  "scripts": {
+    "start": "./start_project.sh",
+    "clean": "./clean_project.sh",
+    "restart": "./restart_servers.sh",
+    "start:frontend": "cd frontend && npm start",
+    "start:backend": "cd backend && python run.py",
+    "build:frontend": "cd frontend && npm run build"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  },
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^22.15.17"
+  },
+  "dependencies": {
+    "@types/lodash": "^4.17.16",
+    "@types/uuid": "^10.0.0",
+    "lodash": "^4.17.21",
+    "uuid": "^11.1.0"
+  }
+}
