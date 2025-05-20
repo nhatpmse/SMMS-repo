@@ -33,13 +33,17 @@ if ! command -v gunicorn &> /dev/null; then
     pip install gunicorn
 fi
 
+# Get port from environment or use default
+PORT=${PORT:-5001}
+echo "Using port: $PORT"
+
 # Start backend with Gunicorn in production
 echo "Starting backend..."
 cd "$BACKEND_DIR" || { echo "Backend directory not found!"; exit 1; }
 
 # Start backend with Gunicorn
 echo "Starting backend with Gunicorn..."
-gunicorn -c gunicorn_config.py run:app &
+gunicorn -b 0.0.0.0:$PORT -w 4 run:app &
 BACKEND_PID=$!
 echo "Backend started with PID: $BACKEND_PID"
 
