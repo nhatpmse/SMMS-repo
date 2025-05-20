@@ -20,6 +20,10 @@ pkill -f "gunicorn" 2>/dev/null
 echo "Starting backend..."
 cd "$BACKEND_DIR" || { echo "Backend directory not found!"; exit 1; }
 
+# Install Python dependencies
+echo "Installing Python dependencies..."
+pip install -r "$SCRIPT_DIR/requirements.txt"
+
 # Check Python virtual environment
 if [ -d "venv" ] || [ -d ".venv" ]; then
     # Activate virtual environment if it exists
@@ -43,14 +47,13 @@ echo "Backend started with PID: $BACKEND_PID"
 echo "Starting frontend..."
 cd "$FRONTEND_DIR" || { echo "Frontend directory not found!"; exit 1; }
 
-# Check if frontend is already built
-if [ ! -d "build" ] || [ -z "$(ls -A build 2>/dev/null)" ]; then
-    echo "Build directory doesn't exist or is empty. Building frontend..."
-    npm run build
-    if [ $? -ne 0 ]; then
-        echo "Error building frontend!"
-        exit 1
-    fi
+# Install frontend dependencies and build
+echo "Installing frontend dependencies and building..."
+npm install
+npm run build
+if [ $? -ne 0 ]; then
+    echo "Error building frontend!"
+    exit 1
 fi
 
 # Start frontend with serve
