@@ -5,10 +5,10 @@ echo "===================================="
 echo "   Starting project in production environment"
 echo "===================================="
 
-# Project root directory
-PROJECT_DIR="/Users/nhatpm/Desktop/project"
-BACKEND_DIR="$PROJECT_DIR/backend"
-FRONTEND_DIR="$PROJECT_DIR/frontend"
+# Get the directory where the script is located
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+BACKEND_DIR="$SCRIPT_DIR/backend"
+FRONTEND_DIR="$SCRIPT_DIR/frontend"
 
 # Check and stop running processes
 echo "Checking and stopping running processes..."
@@ -62,7 +62,7 @@ echo "Frontend started with PID: $FRONTEND_PID"
 echo ""
 echo "===================================="
 echo "   Project started successfully!"
-echo "   Backend: http://localhost:5000"
+echo "   Backend: http://localhost:$PORT"
 echo "   Frontend: http://localhost:3000"
 echo "===================================="
 echo ""
