@@ -10,7 +10,7 @@ pip install -r requirements.txt
 # Install frontend dependencies and serve
 cd frontend
 npm install
-npm install -g serve
+npm install serve
 npm run build
 cd ..
 

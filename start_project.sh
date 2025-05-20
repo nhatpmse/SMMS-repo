@@ -35,7 +35,7 @@ cd "$FRONTEND_DIR" || { echo "Frontend directory not found!"; exit 1; }
 
 # Start frontend with serve
 echo "Starting frontend with serve..."
-serve -s build -l 3000 &
+npx serve -s build -l 3000 &
 FRONTEND_PID=$!
 echo "Frontend started with PID: $FRONTEND_PID"
 
