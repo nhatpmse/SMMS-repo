@@ -20,22 +20,8 @@ pkill -f "gunicorn" 2>/dev/null
 echo "Starting backend..."
 cd "$BACKEND_DIR" || { echo "Backend directory not found!"; exit 1; }
 
-# Install Python dependencies
-echo "Installing Python dependencies..."
-pip install -r "$SCRIPT_DIR/requirements.txt"
-
-# Check Python virtual environment
-if [ -d "venv" ] || [ -d ".venv" ]; then
-    # Activate virtual environment if it exists
-    if [ -d "venv" ]; then
-        source venv/bin/activate
-    else
-        source .venv/bin/activate
-    fi
-    echo "Python virtual environment activated"
-else
-    echo "Warning: Python virtual environment not found. Using system Python."
-fi
+# Activate virtual environment
+source "$SCRIPT_DIR/venv/bin/activate"
 
 # Start backend with Gunicorn in production
 echo "Starting backend with Gunicorn..."
@@ -46,15 +32,6 @@ echo "Backend started with PID: $BACKEND_PID"
 # 2. Start Frontend 
 echo "Starting frontend..."
 cd "$FRONTEND_DIR" || { echo "Frontend directory not found!"; exit 1; }
-
-# Install frontend dependencies and build
-echo "Installing frontend dependencies and building..."
-npm install
-npm run build
-if [ $? -ne 0 ]; then
-    echo "Error building frontend!"
-    exit 1
-fi
 
 # Start frontend with serve
 echo "Starting frontend with serve..."
