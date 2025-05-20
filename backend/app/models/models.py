@@ -245,7 +245,7 @@ class Group(db.Model):
     mentor_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     
     # Relationship to the mentor (User)
-    mentor = db.relationship('User', backref=db.backref('managed_groups', lazy=True))
+    mentor = db.relationship('User', foreign_keys=[mentor_id], backref=db.backref('managed_groups', lazy=True))
     
     # Foreign key to leader (a BroSis user who is designated as leader)
     leader_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
