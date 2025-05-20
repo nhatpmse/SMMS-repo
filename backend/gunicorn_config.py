@@ -21,6 +21,10 @@ loglevel = 'info'
 # Process naming
 proc_name = 'user_management_system'
 
+# Static files
+static_root = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static')
+static_url = '/static/'
+
 # SSL
 keyfile = None
 certfile = None

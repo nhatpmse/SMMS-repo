@@ -16,26 +16,26 @@ pkill -f "node.*react-scripts" 2>/dev/null
 pkill -f "python.*run.py" 2>/dev/null
 pkill -f "gunicorn" 2>/dev/null
 
-# 1. Start backend
-echo "Starting backend..."
-cd "$BACKEND_DIR" || { echo "Backend directory not found!"; exit 1; }
-
 # Activate virtual environment
 source "$SCRIPT_DIR/venv/bin/activate"
 
 # Start backend with Gunicorn in production
+echo "Starting backend..."
+cd "$BACKEND_DIR" || { echo "Backend directory not found!"; exit 1; }
+
+# Start backend with Gunicorn
 echo "Starting backend with Gunicorn..."
 gunicorn -c gunicorn_config.py run:app &
 BACKEND_PID=$!
 echo "Backend started with PID: $BACKEND_PID"
 
-# 2. Start Frontend 
+# Start frontend
 echo "Starting frontend..."
 cd "$FRONTEND_DIR" || { echo "Frontend directory not found!"; exit 1; }
 
 # Start frontend with serve
 echo "Starting frontend with serve..."
-npx serve -s build &
+serve -s build -l 3000 &
 FRONTEND_PID=$!
 echo "Frontend started with PID: $FRONTEND_PID"
 
