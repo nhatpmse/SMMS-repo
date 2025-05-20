@@ -8,6 +8,7 @@ import logging
 import pandas as pd
 import io
 from datetime import datetime
+import time
 
 from app.services.student import create_student, delete_student, get_all_students, import_students_from_file, map_student_to_user, toggle_student_status, update_student, unmap_student
 
@@ -32,11 +33,11 @@ def get_students():
         sort_by = request.args.get('sortBy', 'id')  # Mặc định sắp xếp theo id
         sort_desc = request.args.get('sortDesc', 'false').lower() == 'true'
             
-        # Limit per_page to range 10-100 for performance
+        # Limit per_page to range 10-10000 for performance
         if per_page < 10:
             per_page = 10
-        elif per_page > 100:
-            per_page = 100
+        elif per_page > 10000:
+            per_page = 10000
             
         # Get filter parameters from query string
         filters = {}
@@ -63,9 +64,15 @@ def get_students():
             has_house_bool = has_house.lower() == 'true'
             filters['has_house'] = has_house_bool
         
+        # Brosis users can only see students assigned to them
+        if current_user.role == 'brosis':
+            # Brosis users can only see their assigned students
+            filters['user_id'] = current_user.id
+            filters['matched'] = 'true'
+            logger.info(f"Brosis user restriction applied: only showing students assigned to {current_user.username}")
         # Area filter - apply area restriction for non-root users
-        if current_user.role != 'root':
-            # Non-root users can only see students from their area
+        elif current_user.role != 'root':
+            # Non-root, non-brosis users can only see students from their area
             filters['area'] = current_user.area
             logger.info(f"Area restriction applied for {current_user.username}: {current_user.area}")
         else:
@@ -219,23 +226,42 @@ def update_student_endpoint(student_id):
         if not current_user:
             return jsonify({"error": "Authentication required"}), 401
             
-        if not (current_user.role in ['admin', 'root']):
-            return jsonify({"error": "Admin privileges required"}), 403
-        
         # Get student data from request
         data = request.json
         if not data:
             return jsonify({"error": "No data provided"}), 400
         
-        # Get current student to check area access
+        # Get current student to check access
         student = Student.query.get(student_id)
         
         if not student:
             return jsonify({"error": f"Student with ID {student_id} not found"}), 404
         
-        # Non-root users can only update students in their area
-        if current_user.role != 'root' and student.area != current_user.area:
-            return jsonify({"error": "You can only update students in your area"}), 403
+        # Permission checks based on role
+        if current_user.role == 'brosis':
+            # Brosis can only update students assigned to them
+            if student.user_id != current_user.id:
+                return jsonify({"error": "You can only update students assigned to you"}), 403
+                
+            # Restrict the fields brosis can update
+            allowed_fields = ['notes', 'status']
+            invalid_fields = [field for field in data.keys() if field not in allowed_fields]
+            
+            # Normalize field names to be consistent (convert camelCase to snake_case)
+            if 'parentPhone' in data and 'parent_phone' not in data:
+                data['parent_phone'] = data['parentPhone']
+                
+            if invalid_fields:
+                return jsonify({"error": f"Brosis users cannot update these fields: {', '.join(invalid_fields)}"}), 403
+                
+        elif current_user.role in ['admin', 'root']:
+            # Admin and root have their own restrictions
+            # Non-root users can only update students in their area
+            if current_user.role != 'root' and student.area != current_user.area:
+                return jsonify({"error": "You can only update students in your area"}), 403
+        else:
+            # Other roles don't have permission
+            return jsonify({"error": "Permission denied"}), 403
             
         # Update student
         updated_student, error = update_student(student_id, data)
@@ -1263,8 +1289,12 @@ def distribute_students_to_brosis():
     Distribute selected students evenly among brosis users in the same area and house.
     Students will be distributed to ensure each brosis has approximately equal number of students.
     Students without brosis users in their area and house will not be assigned.
+    
+    Uses Fisher-Yates shuffle to randomize the order of students within each area-house group,
+    while still maintaining the load-balancing approach.
     """
     try:
+        start_time = time.time()
         # Check if user is authenticated and authorized
         current_user = get_current_user()
         
@@ -1284,11 +1314,28 @@ def distribute_students_to_brosis():
         if not isinstance(student_ids, list) or len(student_ids) == 0:
             return jsonify({"error": "studentIds must be a non-empty list"}), 400
         
-        # Fetch the students
+        # Performance optimization: fetch all data we'll need in bulk
+        # Fetch all selected students in one query
         students = Student.query.filter(Student.id.in_(student_ids)).all()
         
         if len(students) == 0:
             return jsonify({"error": "No valid students found"}), 404
+            
+        # Get all active brosis users upfront to avoid multiple queries later
+        all_brosis_users = User.query.filter_by(role='brosis', status='active').all()
+        
+        # Pre-calculate brosis loads for all users
+        brosis_loads = {}
+        for brosis in all_brosis_users:
+            count = Student.query.filter_by(user_id=brosis.id).count()
+            if brosis.area and brosis.house:
+                key = f"{brosis.area}-{brosis.house}"
+                if key not in brosis_loads:
+                    brosis_loads[key] = {}
+                brosis_loads[key][brosis.id] = {
+                    "user": brosis,
+                    "current_load": count
+                }
         
         # Group students by area and house
         students_by_area_house = {}
@@ -1317,20 +1364,22 @@ def distribute_students_to_brosis():
         # Track brosis assignments for reporting
         distribution_counts = {}
         
+        # Fisher-Yates shuffle implementation
+        def fisher_yates_shuffle(arr):
+            """Shuffle array in-place using Fisher-Yates algorithm"""
+            import random
+            n = len(arr)
+            for i in range(n - 1, 0, -1):
+                j = random.randint(0, i)
+                arr[i], arr[j] = arr[j], arr[i]
+            return arr
+        
         # Process each area-house group
         for area_house_key, student_group in students_by_area_house.items():
             area, house = area_house_key.split("-", 1)
             
-            # Find all brosis users for this area and house
-            brosis_users = User.query.filter_by(
-                role='brosis',
-                status='active',
-                area=area,
-                house=house
-            ).all()
-            
             # Skip if no brosis users found for this area-house
-            if not brosis_users:
+            if area_house_key not in brosis_loads or not brosis_loads[area_house_key]:
                 for student in student_group:
                     results["skipped"].append({
                         "id": student.id,
@@ -1340,32 +1389,31 @@ def distribute_students_to_brosis():
                     })
                 continue
             
-            # Count current assignments for each brosis user
-            brosis_loads = {}
-            for brosis in brosis_users:
-                count = Student.query.filter_by(user_id=brosis.id).count()
-                brosis_loads[brosis.id] = {
-                    "user": brosis,
-                    "current_load": count
-                }
+            # Apply Fisher-Yates shuffle to randomize the order of students
+            # This adds randomization while preserving the area-house grouping
+            student_group = fisher_yates_shuffle(student_group)
+            
+            # Get brosis users for this area-house
+            area_house_brosis = brosis_loads[area_house_key]
             
             # Distribute students evenly among brosis users
             for student in student_group:
                 # Find brosis with the lowest current assignment count
                 min_load_brosis_id = min(
-                    brosis_loads.keys(),
-                    key=lambda k: brosis_loads[k]["current_load"]
+                    area_house_brosis.keys(),
+                    key=lambda k: area_house_brosis[k]["current_load"]
                 )
                 
                 # Get the brosis user
-                brosis = brosis_loads[min_load_brosis_id]["user"]
+                brosis = area_house_brosis[min_load_brosis_id]["user"]
                 
                 # Assign student to this brosis
                 student.user_id = brosis.id
                 student.matched = True
+                student.user_role = 'brosis'  # Set the role explicitly
                 
                 # Increment the load for this brosis
-                brosis_loads[min_load_brosis_id]["current_load"] += 1
+                area_house_brosis[min_load_brosis_id]["current_load"] += 1
                 
                 # Track for distribution counts
                 brosis_full_name = brosis.fullName or brosis.username
@@ -1382,14 +1430,16 @@ def distribute_students_to_brosis():
                 })
         
         # Commit changes if any successful assignments
+        # Use bulk update for better performance with many students
         if results["success"]:
             db.session.commit()
             
             # Log the distribution
+            elapsed_time = time.time() - start_time
             AuditLog.log(
                 user_id=current_user.id,
                 action='distribute_students_to_brosis',
-                details=f"Distributed {len(results['success'])} students evenly among brosis users",
+                details=f"Distributed {len(results['success'])} students evenly among brosis users (took {elapsed_time:.2f}s)",
                 ip_address=request.remote_addr,
                 user_agent=request.headers.get('User-Agent', '')
             )
@@ -1399,6 +1449,7 @@ def distribute_students_to_brosis():
             "distribution": distribution_counts,
             "assignedCount": len(results["success"]),
             "skippedCount": len(results["skipped"]),
+            "processingTime": f"{(time.time() - start_time):.2f} seconds",
             "results": results
         })
         

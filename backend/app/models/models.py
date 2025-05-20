@@ -232,3 +232,73 @@ class AuditLog(db.Model):
     
     def __repr__(self):
         return f'<AuditLog {self.id} - {self.action}>'
+
+class Group(db.Model):
+    """Model for mentor-managed student groups"""
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
+    description = db.Column(db.Text, nullable=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    
+    # Foreign key to the mentor who owns this group
+    mentor_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    
+    # Relationship to the mentor (User)
+    mentor = db.relationship('User', backref=db.backref('managed_groups', lazy=True))
+    
+    # Foreign key to leader (a BroSis user who is designated as leader)
+    leader_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
+    
+    # Relationship to the leader (User)
+    leader = db.relationship('User', foreign_keys=[leader_id], backref=db.backref('leading_groups', lazy=True))
+    
+    # Area and house - needed to enforce that groups belong to specific areas/houses
+    area = db.Column(db.String(100), nullable=False)
+    house = db.Column(db.String(100), nullable=False)
+    
+    # Group members (many-to-many relationship with User through GroupMember)
+    members = db.relationship('GroupMember', back_populates='group', cascade="all, delete-orphan")
+    
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'description': self.description,
+            'mentor_id': self.mentor_id,
+            'leader_id': self.leader_id,
+            'area': self.area,
+            'house': self.house,
+            'created_at': self.created_at.isoformat() if self.created_at else None,
+            'updated_at': self.updated_at.isoformat() if self.updated_at else None,
+            'members': [member.to_dict() for member in self.members]
+        }
+    
+    def __repr__(self):
+        return f'<Group {self.name}>'
+
+class GroupMember(db.Model):
+    """Many-to-many association table between Group and User"""
+    id = db.Column(db.Integer, primary_key=True)
+    group_id = db.Column(db.Integer, db.ForeignKey('group.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    joined_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    # Relationships
+    group = db.relationship('Group', back_populates='members')
+    user = db.relationship('User', backref=db.backref('group_memberships', lazy=True))
+    
+    # Every user can only be in a group once
+    __table_args__ = (db.UniqueConstraint('group_id', 'user_id', name='_group_user_uc'),)
+    
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'group_id': self.group_id,
+            'user_id': self.user_id,
+            'joined_at': self.joined_at.isoformat() if self.joined_at else None,
+            'user': self.user.to_dict() if self.user else None
+        }
+    
+    def __repr__(self):
+        return f'<GroupMember {self.id}>'

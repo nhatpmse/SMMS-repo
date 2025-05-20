@@ -27,12 +27,14 @@ def create_app(config_class=Config):
     from app.api.routes import api
     from app.api.student_routes import student_api
     from app.api.student_unmap_endpoint import student_api as student_unmap_api
+    from app.api.group_routes import group_api
     
     # Đăng ký các blueprint
     # Lưu ý: route '/students' trong routes.py đã bị vô hiệu hóa để tránh xung đột
     app.register_blueprint(api, url_prefix='/api')
     app.register_blueprint(student_api, url_prefix='/api')
     app.register_blueprint(student_unmap_api, url_prefix='/api')
+    app.register_blueprint(group_api, url_prefix='/api')
     
     @app.route('/health')
     def health_check():

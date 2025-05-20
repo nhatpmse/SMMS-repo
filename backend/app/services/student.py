@@ -74,6 +74,12 @@ def get_all_students(page=1, per_page=20, filters=None, sort_by='id', sort_desc=
                 matched_value = filters['matched'].lower() == 'true'
                 logger.info(f"Processing matched filter: {filters['matched']} => boolean: {matched_value}")
                 query = query.filter(Student.matched == matched_value)
+                
+            # User ID filter - for limiting students to specific brosis user
+            if 'user_id' in filters and filters['user_id']:
+                user_id = filters['user_id']
+                logger.info(f"Filtering students by user_id: {user_id}")
+                query = query.filter(Student.user_id == user_id)
             
             # Brosis filter - find students assigned to brosis with the given name
             if 'brosisFilter' in filters and filters['brosisFilter']:
@@ -214,6 +220,12 @@ def update_student(student_id, student_data):
             
         if 'phone' in student_data:
             student.phone = student_data['phone']
+            
+        if 'parentPhone' in student_data:
+            student.parent_phone = student_data['parentPhone']
+        
+        if 'parent_phone' in student_data:
+            student.parent_phone = student_data['parent_phone']
             
         if 'area' in student_data:
             student.area = student_data['area']

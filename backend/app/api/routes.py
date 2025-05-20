@@ -67,8 +67,8 @@ def get_users():
     page = request.args.get('page', 1, type=int)
     per_page = request.args.get('per_page', 10, type=int)
     
-    if per_page > 100:
-        per_page = 100
+    if per_page > 10000:
+        per_page = 10000
     
     filters = {}
     
@@ -135,8 +135,8 @@ def get_users_for_mentor():
     page = request.args.get('page', 1, type=int)
     per_page = request.args.get('per_page', 10, type=int)
     
-    if per_page > 100:
-        per_page = 100
+    if per_page > 10000:
+        per_page = 10000
     
     # Set specific filters for users in the same area/house
     filters = {
@@ -198,8 +198,8 @@ def get_brosis_for_mentor():
     page = request.args.get('page', 1, type=int)
     per_page = request.args.get('per_page', 10, type=int)
     
-    if per_page > 100:
-        per_page = 100
+    if per_page > 10000:
+        per_page = 10000
     
     # Set specific filters for brosis users in the same area/house
     filters = {
