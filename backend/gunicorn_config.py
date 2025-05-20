@@ -1,24 +1,27 @@
 # Gunicorn configuration for production
 import multiprocessing
+import os
 
-# Bind to 0.0.0.0:8000
-bind = "0.0.0.0:8000"
+# Server socket
+bind = "0.0.0.0:" + str(os.getenv("PORT", "5001"))
+backlog = 2048
 
-# Number of worker processes
+# Worker processes
 workers = multiprocessing.cpu_count() * 2 + 1
-
-# Worker class to use
-worker_class = "gthread"
-
-# Number of threads per worker
-threads = 2
-
-# Timeout in seconds
+worker_class = 'sync'
+worker_connections = 1000
 timeout = 30
+keepalive = 2
 
-# Reload the application if any file changes
-reload = False
+# Logging
+accesslog = '-'
+errorlog = '-'
+loglevel = 'info'
 
-# Log level
-loglevel = "info"
+# Process naming
+proc_name = 'user_management_system'
+
+# SSL
+keyfile = None
+certfile = None
 

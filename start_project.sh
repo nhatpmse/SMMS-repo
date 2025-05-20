@@ -1,4 +1,4 @@
-#!/bin/zsh
+#!/bin/bash
 # Script to start both frontend and backend for production environment
 
 echo "===================================="
