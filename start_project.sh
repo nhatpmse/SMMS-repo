@@ -9,6 +9,13 @@ echo "===================================="
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 BACKEND_DIR="$SCRIPT_DIR/backend"
 FRONTEND_DIR="$SCRIPT_DIR/frontend"
+VENV_DIR="$SCRIPT_DIR/venv"
+
+# Check if virtual environment exists
+if [ ! -d "$VENV_DIR" ]; then
+    echo "Virtual environment not found. Running build script..."
+    bash "$SCRIPT_DIR/build.sh"
+fi
 
 # Check and stop running processes
 echo "Checking and stopping running processes..."
@@ -17,7 +24,14 @@ pkill -f "python.*run.py" 2>/dev/null
 pkill -f "gunicorn" 2>/dev/null
 
 # Activate virtual environment
-source "$SCRIPT_DIR/venv/bin/activate"
+echo "Activating virtual environment..."
+source "$VENV_DIR/bin/activate"
+
+# Verify gunicorn is installed
+if ! command -v gunicorn &> /dev/null; then
+    echo "Gunicorn not found. Installing..."
+    pip install gunicorn
+fi
 
 # Start backend with Gunicorn in production
 echo "Starting backend..."
