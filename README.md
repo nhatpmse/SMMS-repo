@@ -9,9 +9,7 @@
 
 > 🔐 A comprehensive user management system featuring access control management, 2FA authentication, and complete user data management.
 
-<div align="center">
-  <img src="https://user-images.githubusercontent.com/your-username/your-repo/raw/main/docs/assets/banner.png" alt="Project Banner" width="100%">
-</div>
+
 
 ## ✨ Features Highlights
 
@@ -202,8 +200,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 <div align="center">
 
-Made with ❤️ by Your Team Name
+Made with ❤️ by nhatpm.sg
 
-[Report Bug](https://github.com/yourusername/your-repo-name/issues) · [Request Feature](https://github.com/yourusername/your-repo-name/issues)
 
 </div>
