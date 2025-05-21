@@ -1,182 +1,209 @@
-# Hệ Thống Quản Lý Người Dùng
+# User Management System 🚀
 
-Dự án này là một hệ thống quản lý người dùng hoàn chỉnh với các tính năng quản lý quyền truy cập, xác thực 2FA, và quản lý dữ liệu người dùng đầy đủ.
+[![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](https://choosealicense.com/licenses/mit/)
+[![Python](https://img.shields.io/badge/python-v3.9+-blue.svg)](https://www.python.org/)
+[![Node.js](https://img.shields.io/badge/node-v18.x-green.svg)](https://nodejs.org/)
+[![PostgreSQL](https://img.shields.io/badge/postgresql-v14+-blue.svg)](https://www.postgresql.org/)
+[![React](https://img.shields.io/badge/react-TypeScript-blue.svg)](https://reactjs.org/)
+[![Flask](https://img.shields.io/badge/flask-latest-lightgrey.svg)](https://flask.palletsprojects.com/)
 
-## Cấu Trúc Dự Án
+> 🔐 A comprehensive user management system featuring access control management, 2FA authentication, and complete user data management.
 
-Dự án được chia thành hai phần chính:
+<div align="center">
+  <img src="https://user-images.githubusercontent.com/your-username/your-repo/raw/main/docs/assets/banner.png" alt="Project Banner" width="100%">
+</div>
 
-- **Frontend**: Giao diện người dùng được xây dựng với React, TypeScript và Tailwind CSS
-- **Backend**: API được xây dựng với Flask, SQLAlchemy và hệ thống xác thực JWT
+## ✨ Features Highlights
 
-## Yêu Cầu Hệ Thống
+- 👥 **Advanced User Management**
+- 🔒 **Two-Factor Authentication (2FA)**
+- 🏢 **Hierarchical Organization Structure**
+- 📊 **Bulk Data Operations**
+- 🛡️ **Enterprise-grade Security**
 
-- **Node.js**: v18.x hoặc cao hơn
-- **Python**: v3.9 hoặc cao hơn
-- **PostgreSQL**: v14.x hoặc cao hơn (Có thể dùng SQLite cho môi trường phát triển)
-- **MacOS** hoặc **Linux** (Khuyến nghị)
-- **npm** hoặc **yarn** để quản lý phụ thuộc frontend
+## 🏗️ Architecture
 
-## Cài Đặt và Khởi Động
+The project follows a modern microservices architecture:
 
-### Cài Đặt
+### 🎨 Frontend
+- React with TypeScript
+- Tailwind CSS for styling
+- Modern and responsive UI
+- State management with Redux
 
-1. **Clone repository**:
+### ⚙️ Backend
+- Flask REST API
+- SQLAlchemy ORM
+- JWT Authentication
+- PostgreSQL/SQLite database
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+Make sure you have the following installed:
+
+| Requirement | Version |
+|------------|---------|
+| Node.js    | ≥ 18.x  |
+| Python     | ≥ 3.9   |
+| PostgreSQL | ≥ 14.x  |
+| npm/yarn   | Latest  |
+
+### 🔧 Installation
+
+1. **Clone & Navigate**
    ```bash
    git clone <repository-url>
    cd project
    ```
 
-2. **Cài đặt backend**:
+2. **Set Up Backend** 🐍
    ```bash
    cd backend
    python -m venv venv
-   source venv/bin/activate
+   source venv/bin/activate  # On Windows: .\venv\Scripts\activate
    pip install -r requirements.txt
    ```
 
-3. **Cài đặt frontend**:
+3. **Set Up Frontend** ⚛️
    ```bash
    cd ../frontend
    npm install
    ```
 
-4. **Cấu hình cơ sở dữ liệu**:
-   - Chạy script thiết lập PostgreSQL:
-     ```bash
-     cd ../backend
-     ./setup_postgres.sh
-     ```
-   - Hoặc sử dụng SQLite cho môi trường phát triển:
-     ```bash
-     ./setup_sqlite.sh
-     ```
+4. **Configure Database** 🗄️
+   ```bash
+   cd ../backend
+   ./setup_postgres.sh   # For PostgreSQL
+   # OR
+   ./setup_sqlite.sh     # For SQLite (Development)
+   ```
 
-5. **Khởi tạo cơ sở dữ liệu**:
+5. **Initialize Database** 
    ```bash
    python init_db.py
    ```
 
-### Khởi Động
+## 🚀 Launch Application
 
-Sử dụng script khởi động tự động để chạy cả frontend và backend:
-
+### One-Click Launch
 ```bash
 ./start_project.sh
 ```
 
-Hoặc khởi động riêng từng phần:
+### Manual Launch
 
-1. **Backend**:
+<details>
+<summary>Click to expand manual launch steps</summary>
+
+1. **Start Backend**
    ```bash
    cd backend
    source venv/bin/activate
    python run.py
    ```
 
-2. **Frontend**:
+2. **Start Frontend**
    ```bash
    cd frontend
    npm start
    ```
+</details>
 
-## Tài Liệu
+## 🔑 Key Features
 
-Chi tiết về các tính năng và hướng dẫn sử dụng có thể được tìm thấy trong thư mục `docs`:
+### 👥 User Management
+- User registration and authentication
+- Profile management
+- Role-based access control:
+  - 👑 Root
+  - 👨‍💼 Admin
+  - 👨‍🏫 Mentor
+  - 👥 Brosis
 
-- [Hướng Dẫn Triển Khai](docs/guides/DEPLOYMENT_GUIDE.md)
-- [Xử Lý Sự Cố Cơ Sở Dữ Liệu](docs/troubleshooting/DATABASE_TROUBLESHOOTING.md)
-- [Xử Lý Sự Cố JWT Token](docs/troubleshooting/JWT_TOKEN_TROUBLESHOOTING.md)
-- [Hướng Dẫn Nhập Người Dùng](docs/USER_IMPORT_GUIDE.md)
-- [Hướng Dẫn Xuất Người Dùng](docs/guides/USER_EXPORT_GUIDE.md)
+### 🔒 Security Features
+- JWT Authentication
+- Password encryption
+- Two-Factor Authentication (2FA)
+- Account lockout protection
+- Session management
 
-## Tính Năng Chính
+### 📊 Data Management
+- Bulk user import/export
+- Excel/CSV support
+- Data validation
+- Audit logging
 
-1. **Quản lý người dùng**:
-   - Đăng ký, đăng nhập, quản lý thông tin cá nhân
-   - Phân quyền: root, admin, mentor, brosis
+## 📚 Documentation
 
-2. **Xác thực hai yếu tố (2FA)**:
-   - Bắt buộc cho tài khoản root
-   - Tùy chọn cho các tài khoản khác
+Comprehensive documentation available in the `docs` directory:
 
-3. **Quản lý Area và House**:
-   - Tổ chức người dùng theo cấu trúc phân cấp
+| Guide | Description |
+|-------|-------------|
+| [📘 Deployment Guide](docs/guides/DEPLOYMENT_GUIDE.md) | Step-by-step deployment instructions |
+| [🔧 Database Troubleshooting](docs/troubleshooting/DATABASE_TROUBLESHOOTING.md) | Database-related issues and solutions |
+| [🔑 JWT Token Guide](docs/troubleshooting/JWT_TOKEN_TROUBLESHOOTING.md) | Authentication troubleshooting |
+| [📥 User Import Guide](docs/USER_IMPORT_GUIDE.md) | Bulk user import instructions |
+| [📤 User Export Guide](docs/guides/USER_EXPORT_GUIDE.md) | Data export procedures |
 
-4. **Nhập/Xuất dữ liệu hàng loạt**:
-   - Nhập người dùng từ file Excel
-   - Xuất dữ liệu người dùng ra Excel hoặc CSV
+## 🚀 Production Deployment
 
-5. **Thao tác hàng loạt**:
-   - Kích hoạt, vô hiệu hóa, xóa nhiều người dùng cùng lúc
+### Cleanup & Optimization
+```bash
+./cleanup_production.sh
+```
 
-## Bảo Mật
+### Production Launch
+```bash
+./start_production.sh
+```
 
-Dự án có các tính năng bảo mật cao cấp:
-- Xác thực JWT
-- Mã hóa mật khẩu
-- Xác thực hai yếu tố (2FA)
-- Khóa tài khoản sau nhiều lần đăng nhập sai
+## 👥 Contributing
 
-## Dọn Dẹp và Triển Khai cho Production
+We welcome contributions! Here's how you can help:
 
-Để dọn dẹp dự án và chuẩn bị cho môi trường production, thực hiện các bước sau:
+### 🔄 Repository Setup
+```bash
+git remote add origin https://github.com/yourusername/your-repo-name.git
+git branch -M main
+git push -u origin main
+```
 
-1. **Dọn dẹp dự án** - Loại bỏ các file test, debug và không cần thiết:
+### 🌟 For Contributors
+1. Fork the repository
+2. Create your feature branch
    ```bash
-   ./cleanup_production.sh
+   git checkout -b feature/amazing-feature
    ```
-
-2. **Khởi động trong môi trường production**:
+3. Commit your changes
    ```bash
-   ./start_production.sh
+   git commit -m '✨ Add amazing feature'
    ```
-
-Để biết thêm chi tiết, vui lòng tham khảo:
-- [Hướng Dẫn Triển Khai Production](docs/PRODUCTION_DEPLOYMENT_GUIDE.md)
-
-## Giấy Phép
-
-Dự án này được phát hành dưới giấy phép MIT.
-
-## Collaboration Guide
-
-### Setting up the repository
-1. Create a GitHub repository (if not already done)
-2. Connect your local repository to GitHub:
+4. Push to the branch
    ```bash
-   git remote add origin https://github.com/yourusername/your-repo-name.git
-   git branch -M main
-   git push -u origin main
+   git push origin feature/amazing-feature
    ```
+5. Open a Pull Request
 
-### For collaborators
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/yourusername/your-repo-name.git
-   cd your-repo-name
-   ```
-2. Set up the development environment by following the setup instructions above.
-3. Create a new branch for your feature:
-   ```bash
-   git checkout -b feature/your-feature-name
-   ```
-4. Make your changes and commit them:
-   ```bash
-   git add .
-   git commit -m "Add your meaningful commit message"
-   ```
-5. Push your changes:
-   ```bash
-   git push origin feature/your-feature-name
-   ```
-6. Create a pull request on GitHub.
-
-### Keeping your fork updated
-If you're working from a fork, keep it updated with the main repository:
+### 🔄 Sync Your Fork
 ```bash
 git remote add upstream https://github.com/original-owner/original-repo.git
 git fetch upstream
 git merge upstream/main
 git push origin main
 ```
+
+## 📝 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+---
+
+<div align="center">
+
+Made with ❤️ by Your Team Name
+
+[Report Bug](https://github.com/yourusername/your-repo-name/issues) · [Request Feature](https://github.com/yourusername/your-repo-name/issues)
+
+</div>
